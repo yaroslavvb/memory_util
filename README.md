@@ -10,10 +10,29 @@ memory_util.vlog(1)
 import tensorflow as tf
 
 sess = tf.Session()
-a = tf.random_uniform((1000))
-b = tf.random_uniform((1000))
+a = tf.random_uniform((1000,))
+b = tf.random_uniform((1000,))
 c = a + b
 with memory_util.capture_stderr() as stderr:
     sess.run(c.op)
-memory_util.print_memory_timeline(stderr)
+memory_util.print_memory_timeline(stderr, ignore_less_than_bytes=1000)
+```
+
+And you'll see
+
+```
+       67       random_uniform/RandomUniform(32-cpu)        4000        4000 cpu
+       69                 random_uniform/mul(33-cpu)        4000        8000 cpu
+       71       random_uniform/RandomUniform(32-cpu)       -4000        4000 cpu
+       72                     random_uniform(34-cpu)        4000        8000 cpu
+       74                 random_uniform/mul(33-cpu)       -4000        4000 cpu
+       75     random_uniform_1/RandomUniform(35-cpu)        4000        8000 cpu
+       77               random_uniform_1/mul(36-cpu)        4000       12000 cpu
+       79     random_uniform_1/RandomUniform(35-cpu)       -4000        8000 cpu
+       80                   random_uniform_1(37-cpu)        4000       12000 cpu
+       82               random_uniform_1/mul(36-cpu)       -4000        8000 cpu
+       83                                add(38-cpu)        4000       12000 cpu
+       85                     random_uniform(34-cpu)       -4000        8000 cpu
+       86                   random_uniform_1(37-cpu)       -4000        4000 cpu
+       87                                add(38-cpu)       -4000           0 cpu
 ```
