@@ -95,13 +95,9 @@ def _parse_logline(l):
 
         # Broadcast args give weird allocation messages without size, ignore
         # I tensorflow/core/framework/log_memory.cc:35] __LOG_MEMORY__ MemoryLogTensorAllocation { step_id: 2 kernel_name: "gradients/node_5_grad/BroadcastGradientArgs" tensor { dtype: DT_INT32 shape { dim { } } } }
-        # TODO: investigate why peak memory is underreported in GPU version before rewriting
-
-#        if 'kernel_name: "a1"' in l:
-#            import pdb; pdb.set_trace()
         if not m:
             return {"type": "MemoryLogTensorAllocation", "line": l,
-                    "allocation_id": -1}
+                    "allocation_id": "-1"}
 
         assert m, l
         d = m.groupdict()
@@ -144,23 +140,27 @@ def memory_timeline(log):
         log = log.getvalue()
     
     def unique_alloc_id(line):
+        if line["allocation_id"] == "-1":
+            return "-1"
         return line["allocation_id"]+"-"+line["allocator_name"]
     
     def get_alloc_names(line):
-        for entry in reversed(allocation_map[unique_alloc_id(line)]):
+        alloc_id = unique_alloc_id(line)
+        for entry in reversed(allocation_map.get(alloc_id, [])):
             kernel_name = entry.get("kernel_name", "unknown")
             if not "unknown" in kernel_name:
                 return kernel_name+"("+unique_alloc_id(line)+")"
-        return "("+allocation_id+")"
+        # couldn't find an allocation message with name of kernel
+        return "("+alloc_id+")"
 
     def get_alloc_bytes(line):
-        for entry in allocation_map[unique_alloc_id(line)]:
+        for entry in allocation_map.get(unique_alloc_id(line), []):
             if "allocated_bytes" in entry:
                 return entry["allocated_bytes"]
         return "0"
 
     def get_alloc_type(line):
-        for entry in allocation_map[unique_alloc_id(line)]:
+        for entry in allocation_map.get(unique_alloc_id(line), []):
             if "allocator_name" in entry:
                 return entry["allocator_name"]
         return "0"
