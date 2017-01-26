@@ -5,6 +5,11 @@ This utility parses LOG_MEMORY messages out of TensorFlow vlog output and builds
 ## Example usage:
 
 ```
+# install memory util
+import urllib.request
+response = urllib.request.urlopen("https://raw.githubusercontent.com/yaroslavvb/memory_util/master/memory_util.py")
+open("memory_util.py", "wb").write(response.read())
+
 import memory_util
 memory_util.vlog(1)
 import tensorflow as tf
