@@ -15,3 +15,4 @@ with memory_util.capture_stderr() as stderr:
     sess.run(c.op)
 memory_util.print_memory_timeline(stderr)
 ```
+

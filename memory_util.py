@@ -199,7 +199,8 @@ def memory_timeline(log):
     return result
 
 def peak_memory(log, gpu_only=False):
-    peak_memory = -42000000  # to catch bugs
+    """Peak memory used across all devices."""
+    peak_memory = -123456789 # to catch bugs
     total_memory = 0
     for record in memory_timeline(log):
         i, kernel_name, allocated_bytes, allocator_type = record
