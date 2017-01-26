@@ -1,6 +1,8 @@
 # memory_util
 
-Example usage:
+This utility parses LOG_MEMORY messages out of TensorFlow vlog output and builds timeline of memory allocations
+
+## Example usage:
 
 ```
 import memory_util
@@ -15,4 +17,3 @@ with memory_util.capture_stderr() as stderr:
     sess.run(c.op)
 memory_util.print_memory_timeline(stderr)
 ```
-
