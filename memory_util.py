@@ -71,7 +71,10 @@ tensor_output_regex_no_bytes = re.compile("""MemoryLogTensorOutput.* step_id: (?
 
 
 # 5143420588.000000 file tensorflow/core/framework/log_memory.cc:41] __LOG_MEMORY__ MemoryLogTensorDeallocation { allocation_id: 2 allocator_name: "cpu" }
+# I tensorflow/core/framework/log_memory.cc:35] __LOG_MEMORY__ MemoryLogTensorDeallocation { allocation_id: 15 allocator_name: "gpu_bfc" }
 tensor_deallocation_regex = re.compile("""allocation_id: (?P<allocation_id>\d+).*allocator_name: \"(?P<allocator_name>[^"]+)\".*""")
+# I tensorflow/core/framework/log_memory.cc:35] __LOG_MEMORY__ MemoryLogTensorDeallocation { allocator_name: "tla_jit" }
+xla_tensor_deallocation_regex = re.compile("""allocator_name: \"(?P<allocator_name>[^"]+)\".*""")
 
 # I 6796000229.000000 file tensorflow/core/framework/log_memory.cc:41] __LOG_MEMORY__ MemoryLogRawDeallocation { step_id: -3 operation: "TensorFlow C Api" allocation_id: 177 allocator_name: "cpu" }
 raw_deallocation_regex = re.compile("""allocation_id: (?P<allocation_id>\d+).*allocator_name: \"(?P<allocator_name>[^"]+)\".*""")
@@ -106,6 +109,8 @@ def _parse_logline(l):
             print("Got allocation for %s, %s"%(d["allocation_id"], d["kernel_name"]))
     elif 'MemoryLogTensorDeallocation' in l:
         m = tensor_deallocation_regex.search(l)
+        if m is None and 'tla_jit' in l:
+            m = xla_tensor_deallocation_regex.search(l)
         assert m, l
         d = m.groupdict()
         d["type"] = "MemoryLogTensorDeallocation"
