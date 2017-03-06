@@ -4,6 +4,8 @@ This utility parses LOG_MEMORY messages out of TensorFlow vlog output and builds
 
 ## Example usage:
 
+Only works with TF 1.0 or later
+
 ```
 # install memory util
 import urllib.request
