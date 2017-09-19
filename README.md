@@ -4,7 +4,7 @@ This utility parses LOG_MEMORY messages out of TensorFlow vlog output and builds
 
 ## Example usage:
 
-Only works with TF 1.0.0 or TF 1.0.1
+(only works for GPU for later versions of TF)
 
 ```
 # install memory util
