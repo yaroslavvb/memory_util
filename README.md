@@ -1,3 +1,6 @@
+**Deprecated in favor of mem_util**
+https://github.com/yaroslavvb/chain_constant_memory/blob/master/mem_util_test.py
+
 # memory_util
 
 This utility parses LOG_MEMORY messages out of TensorFlow vlog output and builds timeline of memory allocations
